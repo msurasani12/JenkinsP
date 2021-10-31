@@ -15,7 +15,6 @@ pipeline {
            cron(CRON_SETTINGS)
       }
 	}
-  }
 
   stages {
     stage("Branch Verification") {
