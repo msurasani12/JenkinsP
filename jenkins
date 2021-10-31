@@ -4,13 +4,16 @@ pipeline {
       label 'docker&&swarm'
       image 'hub.comcast.net/dss-ops/ssm-maven-alpine:v10'
     }
-    parameters {
-        booleanParam(name: 'MIDNIGHT_BUILD', defaultValue: 'true', description: 'Midnight build')
-    }
-    triggers {
-        parameterizedCron('''
-           1 * * * * %MIDNIGHT_BUILD=true
-        ''')
+    // parameters {
+    //     booleanParam(name: 'MIDNIGHT_BUILD', defaultValue: 'true', description: 'Midnight build')
+    // }
+    // triggers {
+    //     parameterizedCron('''
+    //        1 * * * * %MIDNIGHT_BUILD=true
+    //     ''')
+       triggers {
+           cron(CRON_SETTINGS)
+      }
 	}
   }
 
