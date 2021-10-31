@@ -1,0 +1,40 @@
+pipeline {
+  agent {
+    docker {
+      label 'docker&&swarm'
+      image 'hub.comcast.net/dss-ops/ssm-maven-alpine:v10'
+    }
+    parameters {
+        booleanParam(name: 'MIDNIGHT_BUILD', defaultValue: 'true', description: 'Midnight build')
+    }
+    triggers {
+        parameterizedCron('''
+           1 * * * * %MIDNIGHT_BUILD=true
+        ''')
+	}
+  }
+
+  stages {
+    stage("Branch Verification") {
+      when {
+        not {
+          anyOf {
+            branch 'master'
+            branch 'main'
+            branch 'develop'
+            expression {
+              return GIT_BRANCH =~ /^(hotfix[\/]*|feature[\/]*|defect[\/]*|test-fix[\/]*|fix[_\/]|release|PR-*)/ 
+              env.MIDNIGHT_BUILD
+            }
+          }
+        }
+      }
+      steps {
+        sh '''
+        echo "Please ensure that your branch name fits the appropriate naming scheme"
+        exit 1
+        '''
+      }
+    }
+  }
+}
